@@ -1,0 +1,9 @@
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  advertiseAddress: 192.168.38.11
+networking:
+  podSubnet: 10.244.0.0/16
+apiServerExtraArgs:
+  service-node-port-range: 30000-32767
+token: #token#
