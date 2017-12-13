@@ -7,14 +7,30 @@ NODE_IP=$1
 CLUSTER_TOKEN=$2
 [ -z "$CLUSTER_TOKEN" ] && echo "Second argument must be the cluster init/join token"
 
-# Using the actual IP instead of 127.0.0.1 for the hostname fixed kubectl logs and/or flannel networking
-echo "$NODE_IP $HOSTNAME" | tee -a /etc/hosts
+### Try to align networking with k8s + flannel assumptions
+
+getent hosts $NODE_IP | grep $NODE_IP | grep $HOSTNAME || {
+  echo "Failed to match IP $NODE_IP to hostname $HOSTNAME"
+  exit 1
+}
+
 sed -i 's/127.*yolean/#\0/' /etc/hosts
 
-# required by kubeadm
-swapoff -a
+NODE_IP_START=${NODE_IP:0:-1}
+echo "${NODE_IP_START}1   kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local" >> /etc/hosts
+for N in 1 2 3 4 5 6 7 8 9; do
+  echo "${NODE_IP_START}$N   yolean-k8s-$N" >> /etc/hosts
+done
 
-### basically https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
+set -x
+ip addr
+ip route
+# kubernetes migth make assumptions on interface based on default route
+#ip route replace default via 192.168.38.1 dev eth1
+set +x
+
+### The rest is basically https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
+# (but with a fix for using eth1)
 
 yum install -y docker
 setenforce 0
@@ -38,43 +54,9 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 EOF
 yum install -y kubelet kubeadm kubectl
 
-### mess with hosts and addresses, leftovers from a struggle with Vagrant's eth0
-
-getent hosts $NODE_IP | grep $NODE_IP | grep $HOSTNAME || {
-  echo "Failed to match IP $NODE_IP to hostname $HOSTNAME"
-  exit 1
-}
-
-NODE_NUM=0
-NODE_IP_START=${NODE_IP:0:-1}
-for N in 1 2 3; do
-  HOST_IP="$NODE_IP_START$N"
-  HOSTS_ENTRY="$HOST_IP yolean-k8s-$N"
-  [ "$HOST_IP" == "$NODE_IP" ] && {
-    NODE_NUM=$N
-    HOSTS_ENTRY="$NODE_IP yolean-k8s-dummy-entry-for-this-node"
-  }
-  echo "$HOSTS_ENTRY" >> /etc/hosts
-done
-
-echo "${NODE_IP_START}1   kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local" >> /etc/hosts
-
-[ $NODE_NUM -eq 0 ] && echo "Failed to identify this node's host entry. Have IP addresses changed?" && exit 1
-
-echo "Node number is $NODE_NUM"
-
-set -x
-ip addr
-ip route
-# kubernetes migth make assumptions on interface based on default route
-#ip route replace default via 192.168.38.1 dev eth1
-set +x
-
-### end of hosts and adressess mess, resume kubeadm
-
 systemctl enable kubelet && systemctl start kubelet
 
-if [ $NODE_NUM -eq 1 ]; then
+if [ "$NODE_IP" == "${NODE_IP_START}1" ]; then
   sed -i "s/#token#/$CLUSTER_TOKEN/" /vagrant/kubeadm-master.yml
   kubeadm init --config=/vagrant/kubeadm-master.yml
   export KUBECONFIG=/etc/kubernetes/admin.conf
@@ -85,5 +67,5 @@ if [ $NODE_NUM -eq 1 ]; then
   sed -i.bak 's|"/opt/bin/flanneld",|"/opt/bin/flanneld", "--iface=eth1",|' /vagrant/kube-flannel.yml
   kubectl apply -f /vagrant/kube-flannel.yml
 else
-  kubeadm join --token="$CLUSTER_TOKEN" 192.168.38.11:6443
+  kubeadm join --token="$CLUSTER_TOKEN" kubernetes:6443
 fi

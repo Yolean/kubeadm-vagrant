@@ -29,6 +29,9 @@ Vagrant.configure('2') do |config|
         vb.memory = NODE_MEM
       end
 
+      # required by kubeadm, needed at every start
+      node.vm.provision "shell", inline: "swapoff -a", run: "always"
+
       node.vm.provision 'shell' do |s|
         s.args = [node_ip, cluster_init_token]
         s.path = 'setup.sh'

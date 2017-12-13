@@ -39,3 +39,7 @@ We found the flanneld flag `--iface=eth1` to change that.
 
 We allow regular pods to be [scheduled](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#master-isolation) on the master.
 This is so we can run a multi-node cluster on 2x4GB memory.
+
+## IP addresses
+
+Hard coded 192.168.38.1X, for no particular reason, where X is the node number.
