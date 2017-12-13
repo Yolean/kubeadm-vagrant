@@ -7,3 +7,8 @@ networking:
 apiServerExtraArgs:
   service-node-port-range: 80-32767
 token: #token#
+tokenTTL: 999999h
+#featureGates:
+  #PersistentLocalVolumes: true
+  #VolumeScheduling: true
+  #SelfHosting: true
