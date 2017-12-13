@@ -5,5 +5,5 @@ api:
 networking:
   podSubnet: 10.244.0.0/16
 apiServerExtraArgs:
-  service-node-port-range: 30000-32767
+  service-node-port-range: 80-32767
 token: #token#

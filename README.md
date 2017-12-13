@@ -43,3 +43,12 @@ This is so we can run a multi-node cluster on 2x4GB memory.
 ## IP addresses
 
 Hard coded 192.168.38.1X, for no particular reason, where X is the node number.
+
+## Node Port range
+
+We allow NodePort to be anything from port 80 and up. This is so we can host HTTP(S) on standard ports without simulating a LoadBalancer.
+
+A sample pod can be created using `kubectl create -f perimeter-test.yml`.
+During pod network troubleshooting we also had to check that `kubectl -n channel exec test -- curl http://perimeter.channel/` works.
+
+Avoid [kubernetes ports](https://kubernetes.io/docs/setup/independent/install-kubeadm/#check-required-ports) when setting `nodePort:`.
