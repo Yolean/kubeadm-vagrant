@@ -7,6 +7,8 @@ NODE_IP=$1
 CLUSTER_TOKEN=$2
 [ -z "$CLUSTER_TOKEN" ] && echo "Second argument must be the cluster init/join token"
 
+export KUBE_FEATURE_GATES="PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"
+
 ### Try to align networking with k8s + flannel assumptions
 
 getent hosts $NODE_IP | grep $NODE_IP | grep $HOSTNAME || {
@@ -30,7 +32,7 @@ ip route
 set +x
 
 ### The rest is basically https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
-# (but with a fix for using eth1)
+# (but with a fix for flannel to use eth1)
 
 yum install -y docker
 setenforce 0
