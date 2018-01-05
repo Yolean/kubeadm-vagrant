@@ -31,6 +31,17 @@ ip route
 #ip route replace default via 192.168.38.1 dev eth1
 set +x
 
+### crictl required according to preflight check at kubeadm join
+
+CRI_VERSION=1.0.0-alpha.0
+yum install -y golang
+curl -SLs -o cri-tools.tar.gz https://github.com/kubernetes-incubator/cri-tools/archive/v$CRI_VERSION.tar.gz
+tar xvzf cri-tools.tar.gz
+rm cri-tools.tar.gz
+cd cri-tools-$CRI_VERSION/
+make
+cp _output/bin/cri* /usr/bin/
+
 ### The rest is basically https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 # (but with a fix for flannel to use eth1)
 
