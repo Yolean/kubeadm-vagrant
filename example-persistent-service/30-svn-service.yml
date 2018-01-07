@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svn
+  namespace: test-persistent-1
+spec:
+  ports:
+    - name: http
+      port: 80
+    - name: rweb
+      port: 9000
+  selector:
+    app: svn
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rweb
+  namespace: test-persistent-1
+spec:
+  clusterIP: None
+  selector:
+    app: svn
+  ports:
+  - port: 9000
+    targetPort: 9000
