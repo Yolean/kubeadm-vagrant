@@ -9,5 +9,5 @@ apiServerExtraArgs:
 token: #token#
 tokenTTL: 999999h
 featureGates:
-  SelfHosting: true
+  #SelfHosting: true
   #HighAvailability: true
