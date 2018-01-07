@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: svn
+  namespace: test-persistent-1
+spec:
+  serviceName: "svn"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: svn
+  template:
+    metadata:
+      labels:
+        app: svn
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: svn
+        image: solsson/rweb-httpd:1.7.3@sha256:dcc26dca1a52864ac1fbe94b8433b8af85768b9f24339342bc98e7f4d03ebb41
+        ports:
+        - name: http
+          containerPort: 80
+        env:
+        - name: AUTHN
+          value: anon
+        volumeMounts:
+        - name: datadir
+          mountPath: /svn
+      - name: rweb
+        image: solsson/rweb:1.7.3@sha256:94353fbcea1ea10304d42cc8cae85b33a9b6108a10988c3badada1649473584a
+        ports:
+        - name: rweb
+          containerPort: 9000
+        env:
+        - name: REPOS_DOWNLOAD_RULE
+          value: "|^/svn/[^/]+/(?!templates/).|"
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      #storageClassName: svn
+      # TODO each workload type should have its own storage class, but let's share the local-storage example now
+      storageClassName: local-storage
+      resources:
+        requests:
+          storage: 10Gi
