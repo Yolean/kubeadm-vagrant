@@ -65,8 +65,13 @@ kubectl apply -f local-volume/mysql-cluster/
 # and now that the PVC is created (with matchLabels), apply the manifests from kubernetes-mysql-cluster
 
 # https://github.com/Yolean/kubernetes-kafka/tree/scale-2
-vagrant ssh yolean-k8s-1 -c 'sudo mkdir /mnt/local-storage/data-pzoo-0'
-vagrant ssh yolean-k8s-2 -c 'sudo mkdir /mnt/local-storage/data-pzoo-1'
-vagrant ssh yolean-k8s-1 -c 'sudo mkdir /mnt/local-storage/data-kafka-0'
-vagrant ssh yolean-k8s-2 -c 'sudo mkdir /mnt/local-storage/data-kafka-1'
+vagrant ssh yolean-k8s-1 -c 'sudo mkdir -p /mnt/local-storage/data-pzoo-0'
+vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/data-pzoo-1'
+vagrant ssh yolean-k8s-1 -c 'sudo mkdir -p /mnt/local-storage/data-kafka-0'
+vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/data-kafka-1'
+kubectl apply -f local-volume/kafka/
 ```
+
+## Heapster
+
+The standard "addon" with influxdb should work, but an alternative is https://github.com/Yolean/kubernetes-kafka/pull/120.
