@@ -52,3 +52,15 @@ A sample pod can be created using `kubectl create -f perimeter-test.yml`.
 During pod network troubleshooting we also had to check that `kubectl -n channel exec test -- curl http://perimeter.channel/` works.
 
 Avoid [kubernetes ports](https://kubernetes.io/docs/setup/independent/install-kubeadm/#check-required-ports) when setting `nodePort:`.
+
+## Local Volumes
+
+Example for two nodes:
+
+```
+# https://github.com/Yolean/kubernetes-mysql-cluster/ scaled to 2
+vagrant ssh yolean-k8s-1 -c 'sudo mkdir -p /mnt/local-storage/mysql-mariadb-0'
+vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/mysql-mariadb-1'
+kubectl apply -f local-volume/mysql-cluster/
+# now that the PVC is created (with matchLabels), apply the manifests from kubernetes-mysql-cluster
+```
