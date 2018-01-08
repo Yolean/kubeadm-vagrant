@@ -58,9 +58,9 @@ Avoid [kubernetes ports](https://kubernetes.io/docs/setup/independent/install-ku
 Example for two nodes:
 
 ```
-# https://github.com/Yolean/kubernetes-mysql-cluster/ scaled to 2
+# https://github.com/Yolean/kubernetes-mysql-cluster/tree/scale-2, but first:
 vagrant ssh yolean-k8s-1 -c 'sudo mkdir -p /mnt/local-storage/mysql-mariadb-0'
 vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/mysql-mariadb-1'
 kubectl apply -f local-volume/mysql-cluster/
-# now that the PVC is created (with matchLabels), apply the manifests from kubernetes-mysql-cluster
+# and now that the PVC is created (with matchLabels), apply the manifests from kubernetes-mysql-cluster
 ```
