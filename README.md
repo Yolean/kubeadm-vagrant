@@ -70,6 +70,11 @@ vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/data-pzoo-1'
 vagrant ssh yolean-k8s-1 -c 'sudo mkdir -p /mnt/local-storage/data-kafka-0'
 vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/data-kafka-1'
 kubectl apply -f local-volume/kafka/
+
+# https://github.com/Yolean/kubernetes-monitoring
+vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/prometheus-custom-db-prometheus-custom-0'
+vagrant ssh yolean-k8s-1 -c 'sudo mkdir -p /mnt/local-storage/prometheus-k8s-db-prometheus-k8s-0'
+vagrant ssh yolean-k8s-2 -c 'sudo mkdir -p /mnt/local-storage/prometheus-k8s-db-prometheus-k8s-1'
 ```
 
 ## Heapster
