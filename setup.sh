@@ -29,6 +29,10 @@ ip route
 #ip route replace default via 192.168.38.1 dev eth1
 set +x
 
+yum install -y ntp
+chkconfig ntpd on
+service ntpd start
+
 ### The rest is basically https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 # (but with a fix for flannel to use eth1)
 
